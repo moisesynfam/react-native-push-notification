@@ -38,8 +38,9 @@ NotificationsComponent.prototype.cancelLocalNotifications = function(details: Ob
 	RNPushNotification.cancelLocalNotifications(details);
 };
 
-NotificationsComponent.prototype.clearLocalNotification = function(details: Object) {
-	RNPushNotification.clearLocalNotification(details);
+NotificationsComponent.prototype.clearLocalNotification = function(details: Object, tag = null) {
+	
+	RNPushNotification.clearLocalNotification(details, tag);
 };
 
 NotificationsComponent.prototype.cancelAllLocalNotifications = function() {

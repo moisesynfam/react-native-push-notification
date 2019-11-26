@@ -208,7 +208,7 @@ public class RNPushNotificationHelper {
                 }
             }
 
-            NotificationCompat.Builder notification = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            NotificationCompat.Builder notification = new NotificationCompat.Builder(context, bundle.getString("customChannelId",NOTIFICATION_CHANNEL_ID))
                     .setContentTitle(title)
                     .setTicker(bundle.getString("ticker"))
                     .setVisibility(visibility)
@@ -326,7 +326,7 @@ public class RNPushNotificationHelper {
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationManager notificationManager = notificationManager();
-            checkOrCreateChannel(notificationManager);
+            checkOrCreateChannel(notificationManager, bundle);
 
             notification.setContentIntent(pendingIntent);
 
@@ -346,13 +346,13 @@ public class RNPushNotificationHelper {
 
             if (actionsArray != null) {
                 // No icon for now. The icon value of 0 shows no icon.
-                int icon = 0;
+                int icon =  0;
 
                 // Add button for each actions.
                 for (int i = 0; i < actionsArray.length(); i++) {
-                    String action;
+                    String actionName;
                     try {
-                        action = actionsArray.getString(i);
+                        actionName = actionsArray.getString(i);
                     } catch (JSONException e) {
                         Log.e(LOG_TAG, "Exception while getting action from actionsArray.", e);
                         continue;
@@ -360,15 +360,18 @@ public class RNPushNotificationHelper {
 
                     Intent actionIntent = new Intent(context, intentClass);
                     actionIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    actionIntent.setAction(context.getPackageName() + "." + action);
+                    actionIntent.setAction(context.getPackageName() + "." + actionName);
 
                     // Add "action" for later identifying which button gets pressed.
-                    bundle.putString("action", action);
+                    bundle.putString("action", actionName);
                     actionIntent.putExtra("notification", bundle);
 
                     PendingIntent pendingActionIntent = PendingIntent.getActivity(context, notificationID, actionIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT);
-                    notification.addAction(icon, action, pendingActionIntent);
+
+                    Log.d(LOG_TAG, "Drawable id: " + icon);
+                    NotificationCompat.Action action = new NotificationCompat.Action.Builder(icon, actionName, pendingActionIntent).build();
+                    notification.addAction(action);
                 }
             }
 
@@ -491,6 +494,13 @@ public class RNPushNotificationHelper {
         notificationManager.cancel(notificationID);
     }
 
+    public void clearNotification(int notificationID, String tag) {
+        Log.i(LOG_TAG, "Clearing notification: " + notificationID);
+
+        NotificationManager notificationManager = notificationManager();
+        notificationManager.cancel(tag, notificationID);
+    }
+
     public void cancelAllScheduledNotifications() {
         Log.i(LOG_TAG, "Cancelling all notifications");
 
@@ -551,15 +561,13 @@ public class RNPushNotificationHelper {
     }
 
     private static boolean channelCreated = false;
-    private void checkOrCreateChannel(NotificationManager manager) {
+    private void checkOrCreateChannel(NotificationManager manager, Bundle bundle) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
             return;
         if (channelCreated)
             return;
         if (manager == null)
             return;
-
-        Bundle bundle = new Bundle();
 
         int importance = NotificationManager.IMPORTANCE_HIGH;
         final String importanceString = bundle.getString("importance");

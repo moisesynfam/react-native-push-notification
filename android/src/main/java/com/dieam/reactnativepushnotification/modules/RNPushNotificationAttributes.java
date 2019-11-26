@@ -36,6 +36,7 @@ public class RNPushNotificationAttributes {
     private static final String REPEAT_TYPE = "repeatType";
     private static final String REPEAT_TIME = "repeatTime";
     private static final String ONGOING = "ongoing";
+    private static final String CUSTOM_CHANNEL_ID = "customChannelId";
 
     private final String id;
     private final String message;
@@ -60,6 +61,7 @@ public class RNPushNotificationAttributes {
     private final String repeatType;
     private final double repeatTime;
     private final boolean ongoing;
+    private final String customChannelId;
 
     public RNPushNotificationAttributes(Bundle bundle) {
         id = bundle.getString(ID);
@@ -85,6 +87,7 @@ public class RNPushNotificationAttributes {
         repeatType = bundle.getString(REPEAT_TYPE);
         repeatTime = bundle.getDouble(REPEAT_TIME);
         ongoing = bundle.getBoolean(ONGOING);
+        customChannelId = bundle.getString(CUSTOM_CHANNEL_ID);
     }
 
     private RNPushNotificationAttributes(JSONObject jsonObject) {
@@ -112,6 +115,7 @@ public class RNPushNotificationAttributes {
             repeatType = jsonObject.has(REPEAT_TYPE) ? jsonObject.getString(REPEAT_TYPE) : null;
             repeatTime = jsonObject.has(REPEAT_TIME) ? jsonObject.getDouble(REPEAT_TIME) : 0.0;
             ongoing = jsonObject.has(ONGOING) ? jsonObject.getBoolean(ONGOING) : false;
+            customChannelId = jsonObject.has(CUSTOM_CHANNEL_ID) ? jsonObject.getString(CUSTOM_CHANNEL_ID) : null;
         } catch (JSONException e) {
             throw new IllegalStateException("Exception while initializing RNPushNotificationAttributes from JSON", e);
         }
@@ -196,6 +200,7 @@ public class RNPushNotificationAttributes {
         bundle.putString(REPEAT_TYPE, repeatType);
         bundle.putDouble(REPEAT_TIME, repeatTime);
         bundle.putBoolean(ONGOING, ongoing);
+        bundle.putString(CUSTOM_CHANNEL_ID, customChannelId);
         return bundle;
     }
 
@@ -225,6 +230,7 @@ public class RNPushNotificationAttributes {
             jsonObject.put(REPEAT_TYPE, repeatType);
             jsonObject.put(REPEAT_TIME, repeatTime);
             jsonObject.put(ONGOING, ongoing);
+            jsonObject.put(CUSTOM_CHANNEL_ID, customChannelId);
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Exception while converting RNPushNotificationAttributes to " +
                     "JSON. Returning an empty object", e);
@@ -260,6 +266,7 @@ public class RNPushNotificationAttributes {
                 ", repeatType='" + repeatType + '\'' +
                 ", repeatTime=" + repeatTime +
                 ", ongoing=" + ongoing +
+                ", customChannelId=" + customChannelId +
                 '}';
     }
 
